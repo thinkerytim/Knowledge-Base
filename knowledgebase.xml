@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" version="3.4.1" method="upgrade">
+    <name>COM_KNOWLEDGEBASE</name>
+    <creationDate>May 2015</creationDate>
+    <author>The Thinkery LLC</author>
+    <authorEmail>info@thethinkery.net</authorEmail>
+    <authorUrl>http://www.thethinkery.net</authorUrl>
+    <copyright>Copyright (c) 2015 The Thinkery LLC All Rights Reserved</copyright>
+    <license>GNU/GPL v2</license>
+    <version>3.4.1</version>
+    <description>COM_KNOWLEDGEBASE_DESC</description>
+    <scriptfile>installfile.php</scriptfile>
+
+    <languages>
+        <language tag="en-GB">languages/site/en-GB/en-GB.com_knowledgebase.ini</language>
+    </languages>
+
+    <install>
+        <sql>
+            <file driver="mysql" charset="utf8">sql/install.knowledgebase.sql</file>
+        </sql>
+    </install>
+
+    <uninstall>
+        <sql>
+            <file driver="mysql" charset="utf8">sql/uninstall.knowledgebase.sql</file>
+        </sql>
+    </uninstall>
+
+    <update>
+        <schemas>
+            <schemapath type="mysql">sql/updates/mysql</schemapath>
+        </schemas>
+    </update>
+
+    <files folder="site">
+        <filename>controller.php</filename>
+        <filename>index.html</filename>
+        <filename>knowledgebase.php</filename>
+        <filename>router.php</filename>
+        <folder>controllers</folder>
+        <folder>helpers</folder>
+        <folder>models</folder>
+        <folder>sef_ext</folder>
+        <folder>views</folder>
+    </files>
+
+    <administration>
+        <menu view="knowledgebase" link="option=com_knowledgebase">COM_KNOWLEDGEBASE</menu>
+        <submenu>
+            <menu view="categories">COM_KNOWLEDGEBASE_CATEGORIES</menu>
+            <menu view="items">COM_KNOWLEDGEBASE_ITEMS</menu>
+        </submenu>
+        <files folder="admin">
+            <filename>access.xml</filename>
+            <filename>config.xml</filename>
+            <filename>controller.php</filename>
+            <filename>index.html</filename>
+            <filename>knowledgebase.php</filename>
+            <folder>assets</folder>
+            <folder>controllers</folder>
+            <folder>helpers</folder>
+            <folder>models</folder>
+            <folder>sql</folder>
+            <folder>tables</folder>
+            <folder>views</folder>
+        </files>
+        <languages>
+            <language tag="en-GB">languages/admin/en-GB/en-GB.com_knowledgebase.ini</language>
+            <language tag="en-GB">languages/admin/en-GB/en-GB.com_knowledgebase.sys.ini</language>
+        </languages>
+    </administration>
+
+</extension>
