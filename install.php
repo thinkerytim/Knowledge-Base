@@ -79,20 +79,6 @@ class com_knowledgebaseInstallerScript
 
     function install($parent)
     {
-        // Define vars
-        $sample_data_file       = JPATH_ADMINISTRATOR.'/components/com_knowledgebase/assets/install.sampledata.sql';
-        $sample_data_rslt       = '<span class="label label-success">Sample data installed</span>';
-
-        // Check if sample data file exists and execute query
-        if(JFile::exists($sample_data_file)){
-            if(!$this->populateDatabase($this->db, $sample_data_file)){
-                $sample_data_rslt   = '<span class="text-error">Sample data not installed</span>';
-            }
-        }else{ // Could not find sample data file
-            $sample_data_rslt   = '<span class="text-error">Sample data not installed</span>';
-            $this->iperror[]    = 'Could not find sample data file - '.$sample_data_file;
-        }
-
         // Set installation message
         $this->install_message .= '
             <h3>Installation Status:</h3>
@@ -100,10 +86,6 @@ class com_knowledgebaseInstallerScript
             is to go into the settings area and configure your component. When you have your configuration done,
             start by adding a KB category, then start populating KB items! Please post issues to the support forums at
             extensions.thethinkery.net</p>
-
-            <ul>
-                <li>Sample data execution: '.$sample_data_rslt.'</li>
-            </ul>
 
             <h3>Media Status:</h3>
             <ul>';
@@ -153,19 +135,7 @@ class com_knowledgebaseInstallerScript
 
         $drop_array = array('ipcategories'=>'iproperty_categories',
             'ipproperties'=>'iproperty',
-            'ipimages'=>'iproperty_images',
-            'ipcompanies'=>'iproperty_companies',
-            'ipagents'=>'iproperty_agents',
-            'ipamenities'=>'iproperty_amenities',
-            'ipcountries'=>'iproperty_countries',
-            'ipstates'=>'iproperty_states',
-            'ipopenhouses'=>'iproperty_openhouses',
-            'ipsettings'=>'iproperty_settings',
-            'ipsaved'=>'iproperty_saved',
-            'ipcurrency'=>'iproperty_currency',
-            'ipagentmid'=>'iproperty_agentmid',
-            'ippropmid'=>'iproperty_propmid',
-            'ipstypes'=>'iproperty_stypes');
+            'ipimages'=>'iproperty_images');
 
         foreach($drop_array AS $key => $value)
         {
@@ -197,18 +167,6 @@ class com_knowledgebaseInstallerScript
                         <tr><td class="key">Categories Table</td><td style="text-align: center !important;">'.$drop_results['ipcategories'].'</td></tr>
                         <tr><td class="key">Properties Table</td><td style="text-align: center !important;">'.$drop_results['ipproperties'].'</td></tr>
                         <tr><td class="key">Images Table</td><td style="text-align: center !important;">'.$drop_results['ipimages'].'</td></tr>
-                        <tr><td class="key">Companies Table</td><td style="text-align: center !important;">'.$drop_results['ipcompanies'].'</td></tr>
-                        <tr><td class="key">Agents Table</td><td style="text-align: center !important;">'.$drop_results['ipagents'].'</td></tr>
-                        <tr><td class="key">Amenities Table</td><td style="text-align: center !important;">'.$drop_results['ipamenities'].'</td></tr>
-                        <tr><td class="key">Countries Table</td><td style="text-align: center !important;">'.$drop_results['ipcountries'].'</td></tr>
-                        <tr><td class="key">States Table</td><td style="text-align: center !important;">'.$drop_results['ipstates'].'</td></tr>
-                        <tr><td class="key">Open Houses Table</td><td style="text-align: center !important;">'.$drop_results['ipopenhouses'].'</td></tr>
-                        <tr><td class="key">Settings Table</td><td style="text-align: center !important;">'.$drop_results['ipsettings'].'</td></tr>
-                        <tr><td class="key">Saved Properties Table</td><td style="text-align: center !important;">'.$drop_results['ipsaved'].'</td></tr>
-                        <tr><td class="key">Currencies Table</td><td style="text-align: center !important;">'.$drop_results['ipcurrency'].'</td></tr>
-                        <tr><td class="key">Agents Mid Table</td><td style="text-align: center !important;">'.$drop_results['ipagentmid'].'</td></tr>
-                        <tr><td class="key">Properties Mid Table</td><td style="text-align: center !important;">'.$drop_results['ippropmid'].'</td></tr>
-                        <tr><td class="key">Sale Types Table</td><td style="text-align: center !important;">'.$drop_results['ipstypes'].'</td></tr>
                     </tbody>
                 </table>
             </div>
