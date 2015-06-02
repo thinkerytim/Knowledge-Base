@@ -19,8 +19,8 @@ class knowledgebaseController extends JControllerLegacy
     public function __construct()
     {
         $this->debug = false;
-        if($this->debug) $this->log =JLog::getInstance('iproperty.log.php'); // create the logfile TODO: maybe add a debug switch to the admin to turn this off or on
-        if($this->debug) $this->log->addEntry(array('COMMENT' => 'Constructing IProperty'));
+        if($this->debug) $this->log =JLog::getInstance('knowledgebase.log.php'); // create the logfile TODO: maybe add a debug switch to the admin to turn this off or on
+        if($this->debug) $this->log->addEntry(array('COMMENT' => 'Constructing KnowledgeBase'));
 
         parent::__construct();
     }
