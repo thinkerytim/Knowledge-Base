@@ -15,7 +15,7 @@ jimport('joomla.filesystem.file');
 class com_knowledgebaseInstallerScript
 {
     private $tmppath;
-    private $ipmedia;
+    private $kbmedia;
     private $installed_mods             = array();
     private $installed_plugs            = array();
     private $release                    = '3.3.2';
@@ -37,14 +37,14 @@ class com_knowledgebaseInstallerScript
         // get new version of IP from manifest and define class variables
         $this->release  = $parent->get("manifest")->version;
         $this->tmppath  = JPATH_ROOT.'/media/iptmp';
-        $this->ipmedia  = JPATH_ROOT.'/media/com_iproperty';
+        $this->kbmedia  = JPATH_ROOT.'/media/com_knowledgebase';
         $this->db       = JFactory::getDBO();
 
         // Find mimimum required joomla version
         $this->minimum_joomla_release = $parent->get("manifest")->attributes()->version;
 
         if( version_compare( $jversion->getShortVersion(), $this->minimum_joomla_release, 'lt' ) ) {
-            JError::raiseWarning('', 'Cannot install Intellectual Property '.$this->release.' in a Joomla release prior to '.$this->minimum_joomla_release);
+            JError::raiseWarning('', 'Cannot install KnowledgeBase '.$this->release.' in a Joomla release prior to '.$this->minimum_joomla_release);
             return false;
         }
 
@@ -54,7 +54,7 @@ class com_knowledgebaseInstallerScript
                 $oldRelease = $this->getParam('version');
                 $rel = $oldRelease . ' to ' . $this->release;
                 if ( version_compare( $this->release, $oldRelease, 'lt' ) ) {
-                    JError::raiseWarning( '', 'Incorrect version sequence. Cannot upgrade Intellectual Property ' . $rel );
+                    JError::raiseWarning( '', 'Incorrect version sequence. Cannot upgrade KnowledgeBase ' . $rel );
                     return false;
                 }
                 $this->installModsPlugs($parent);
@@ -66,29 +66,21 @@ class com_knowledgebaseInstallerScript
         }
 
         // check for required libraries
-        $curl_exists        = (extension_loaded('curl') && function_exists('curl_init')) ? '<span class="label label-success">Enabled</span>' : '<span class="text-error">Disabled</span>';
         $gd_exists          = (extension_loaded('gd') && function_exists('gd_info')) ? '<span class="label label-success">Enabled</span>' : '<span class="text-error">Disabled</span>';
-        $php_version        = (PHP_VERSION >= 5.3) ? '<span class="label label-success">'.PHP_VERSION.'</span>' : '<span class="text-error">'.PHP_VERSION.'</span>';
-        $php_calendar       = extension_loaded('calendar') ? '<span class="label label-success">Enabled</span>' : '<span class="text-error">Disabled</span>';
-        $php_simplexml      = extension_loaded('simplexml') ? '<span class="label label-success">Enabled</span>' : '<span class="text-error">Disabled</span>';
 
         // Set preflight message
         $this->preflight_message .=  '
             <h3>Preflight Status: ' . $action . ' - ' . $rel . '</h3>
             <ul>
-                <li>Current IP version: <span class="label label-success">'.$this->release.'</span></li>
-                <li>PHP Version: '.$php_version.'</li>
-                <li>cURL Support: '.$curl_exists.'</li>
+                <li>Current KB version: <span class="label label-success">'.$this->release.'</span></li>
                 <li>GD Support: '.$gd_exists.'</li>
-                <li>SimpleXML: '.$php_simplexml.'</li>
-                <li>Calendar Extension: '.$php_calendar.'</li>
             </ul>';
     }
 
     function install($parent)
     {
         // Define vars
-        $sample_data_file       = JPATH_ADMINISTRATOR.'/components/com_iproperty/assets/install.sampledata.sql';
+        $sample_data_file       = JPATH_ADMINISTRATOR.'/components/com_knowledgebase/assets/install.sampledata.sql';
         $sample_data_rslt       = '<span class="label label-success">Sample data installed</span>';
 
         // Check if sample data file exists and execute query
@@ -104,9 +96,9 @@ class com_knowledgebaseInstallerScript
         // Set installation message
         $this->install_message .= '
             <h3>Installation Status:</h3>
-            <p>Congratulations on your install of Intellectual Property! The first thing to do to get started with Intellectual Property
+            <p>Congratulations on your install of KnowledgeBase by the Thinkery LLC! The first thing to do to get started
             is to go into the settings area and configure your component. When you have your configuration done,
-            start by adding a property category, then company, then agents, and finally properties! Please post issues to the support forums at
+            start by adding a KB category, then start populating KB items! Please post issues to the support forums at
             extensions.thethinkery.net</p>
 
             <ul>
@@ -116,46 +108,25 @@ class com_knowledgebaseInstallerScript
             <h3>Media Status:</h3>
             <ul>';
         //create media folders
-        $folder_array       = array('', 'agents', 'categories', 'companies', 'pictures');
+        $folder_array       = array('', 'categories', 'pictures');
         $default_files      = JFolder::files($this->tmppath);
         foreach($folder_array as $folder){
-            if(!JFolder::exists($this->ipmedia.'/'.$folder)){
-                if(!JFolder::create($this->ipmedia.'/'.$folder, 0755) ) {
-                    $this->iperror[] = 'Could not create the <em>'.$this->ipmedia.'/'.$folder.'</em> folder. Please check your media folder permissions';
-                    $this->install_message .= '<li>media/com_iproperty/'.$folder.': <span class="text-error">Not created</span></li>';
+            if(!JFolder::exists($this->kbmedia.'/'.$folder)){
+                if(!JFolder::create($this->kbmedia.'/'.$folder, 0755) ) {
+                    $this->iperror[] = 'Could not create the <em>'.$this->kbmedia.'/'.$folder.'</em> folder. Please check your media folder permissions';
+                    $this->install_message .= '<li>media/com_knowledgebase/'.$folder.': <span class="text-error">Not created</span></li>';
                 }else{
-                    $folderpath = $this->ipmedia.'/'.$folder;
+                    $folderpath = $this->kbmedia.'/'.$folder;
                     // copy a nopic.png and index.html into each created directory
                     JFile::copy($this->tmppath.'/nopic.png', $folderpath.'/nopic.png');
                     JFile::copy($this->tmppath.'/index.html', $folderpath.'/index.html');
-                    $this->install_message .= '<li>media/com_iproperty/'.$folder.': <span class="label label-success">Created</span></li>';
+                    $this->install_message .= '<li>media/com_knowledgebase/'.$folder.': <span class="label label-success">Created</span></li>';
                 }
             }else{
-                $this->install_message .= '<li>media/com_iproperty/'.$folder.': <span class="label label-success">Exists from previous install</span></li>';
+                $this->install_message .= '<li>media/com_knowledgebase/'.$folder.': <span class="label label-success">Exists from previous install</span></li>';
             }
         }
-        // copy csv import sample to iproperty media root
-        if(JFile::copy($this->tmppath.'/iprop_export_sample.csv', $this->ipmedia.'/iprop_export_sample.csv')){
-            $this->install_message .= '<li>Sample csv import file <span class="label label-success">Successfully installed</span><br />(<em>'.$this->ipmedia.'/iprop_export_sample.csv</em>)</li>';
-        }else{
-            $this->install_message .= '<li>Sample csv import file <span class="text-error">NOT successfully installed</span><br />(<em>'.$this->ipmedia.'/iprop_export_sample.csv</em>)</li>';
-        }
-        // copy xml import sample to iproperty media root
-        if(JFile::copy($this->tmppath.'/iprop_export_sample.xml', $this->ipmedia.'/iprop_export_sample.xml')){
-            $this->install_message .= '<li>Sample xml import file <span class="label label-success">Successfully installed</span><br />(<em>'.$this->ipmedia.'/iprop_export_sample.xml</em>)</li>';
-        }else{
-            $this->install_message .= '<li>Sample xml import file <span class="text-error">NOT successfully installed</span><br />(<em>'.$this->ipmedia.'/iprop_export_sample.xml</em>)</li>';
-        }
-        // copy category icons to iproperty categories
-        $icon_count = 1;
-        while ($icon_count <= 7){ // adjust if we add more icons
-            if(JFile::copy($this->tmppath.'/house-icon'.$icon_count.'.png', $this->ipmedia.'/categories/house-icon'.$icon_count.'.png')){
-                $this->install_message .= '<li>Category icon <span class="label label-success">successfully installed</span><br />(<em>'.$this->ipmedia.'/categories/house-icon'.$icon_count.'.png</em>)</li>';
-            }else{
-                $this->install_message .= '<li>Category icon <span class="text-error">NOT successfully installed</span><br />(<em>'.$this->ipmedia.'/categories/house-icon'.$icon_count.'.png</em>)</li>';
-            }
-            $icon_count++;
-        }
+
         $this->install_message .= '
             </ul>';
     }
@@ -167,47 +138,11 @@ class com_knowledgebaseInstallerScript
      */
     function update($parent)
     {
-        // copy csv import sample to iproperty media root
-        if(JFile::copy($this->tmppath.'/iprop_export_sample.csv', $this->ipmedia.'/iprop_export_sample.csv')){
-            $csv_copy = 'Sample csv import file <span class="label label-success">Successfully updated</span><br />(<em>'.$this->ipmedia.'/iprop_export_sample.csv</em>)';
-        }else{
-            $csv_copy = 'Sample csv import file <span class="text-error">Update FAILED</span><br />(<em>'.$this->ipmedia.'/iprop_export_sample.csv</em>)';
-        }
-        // copy xml import sample to iproperty media root
-        if(JFile::copy($this->tmppath.'/iprop_export_sample.xml', $this->ipmedia.'/iprop_export_sample.xml')){
-            $xml_copy = 'Sample xml import file <span class="label label-success">Successfully installed</span><br />(<em>'.$this->ipmedia.'/iprop_export_sample.xml</em>)';
-        }else{
-            $xml_copy = 'Sample xml import file <span class="text-error">NOT successfully installed</span><br />(<em>'.$this->ipmedia.'/iprop_export_sample.xml</em>)';
-        }
-        // copy category icons to iproperty categories if IP < 3.3.2
-        if (version_compare($this->getParam('version'), '3.3.1', "<=")) {
-            $icon_count = 1;
-            while ($icon_count <= 7){ // adjust if we add more icons
-                if(JFile::copy($this->tmppath.'/house-icon'.$icon_count.'.png', $this->ipmedia.'/categories/house-icon'.$icon_count.'.png')){
-                    $this->install_message .= '<li>Category icon <span class="label label-success">successfully installed</span><br />(<em>'.$this->ipmedia.'/categories/house-icon'.$icon_count.'.png</em>)</li>';
-                }else{
-                    $this->install_message .= '<li>Category icon <span class="text-error">NOT successfully installed</span><br />(<em>'.$this->ipmedia.'/categories/house-icon'.$icon_count.'.png</em>)</li>';
-                }
-                $icon_count++;
-            }
-        }
-
-        // remove the manage model if it still exists from a 2.5 upgrade. No longer used in Ip3
-        if(JFile::exists(JPATH_ROOT.'/components/com_iproperty/models/manage.php')){
-            // delete file
-            JFile::delete(JPATH_ROOT.'/components/com_iproperty/models/manage.php');
-        }
-
         // Set update message
         $this->update_message .=  '
             <h3>Update Status</h3>
-            <p>Congratulations on your update of Intellectual Property! Please take a look at the changelog to the right
-            to see what\'s new! Please post issues to the support forums at extensions.thethinkery.net</p>
-
-            <ul class="checklist">
-                <li>'.$csv_copy.'</li>
-                <li>'.$xml_copy.'</li>
-            </ul>';
+            <p>Congratulations on your update of KnowledgeBase! Please take a look at the changelog to the right
+            to see what\'s new! Please post issues to the support forums at extensions.thethinkery.net</p>';
     }
 
     function uninstall($parent)
@@ -282,14 +217,14 @@ class com_knowledgebaseInstallerScript
                     <tr><td valign="top"><h3>Thank you for using IProperty!</h3></td></tr>
                     <tr>
                         <td valign="top">
-                            <p>Thank you for using Intellectual Property. If you have any new feature requests we would love to hear
+                            <p>Thank you for using KnowledgeBase. If you have any new feature requests we would love to hear
                             them! Please post requests in the forums at <a href="http://extensions.thethinkery.net" target="_blank">http://extensions.thethinkery.net</a>. Ideas for
                             new component features, modules, and plugins are welcome. If you have questions please post to the support forum or email
                             us at <a href="mailto:iproperty@thethinkery.net">iproperty@thethinkery.net</a>.</p>
 
                             <h4>Upgrade Instructions:</h4>
-                            <p>If you are upgrading to a newer version of Intellectual Property, please visit <a href="http://extensions.thethinkery.net" target="_blank">http://extensions.thethinkery.net</a>
-                            to review upgrade instructions. All media folders and files have been preserved for use in future upgrades and can be located in your site/media/com_iproperty folder.</p>
+                            <p>If you are upgrading to a newer version of KnowledgeBase, please visit <a href="http://extensions.thethinkery.net" target="_blank">http://extensions.thethinkery.net</a>
+                            to review upgrade instructions. All media folders and files have been preserved for use in future upgrades and can be located in your site/media/com_knowledgebase folder.</p>
                         </td>
                     </tr>
                 </table>
@@ -312,7 +247,7 @@ class com_knowledgebaseInstallerScript
         </style>
 
         <div class="row-fluid iplogoheader">
-            '.JHTML::_('image', 'administrator/components/com_iproperty/assets/images/iproperty_admin_logo.gif', 'Intellectual Property :: By The Thinkery' ).'
+            '.JHTML::_('image', 'administrator/components/com_knowledgebase/assets/images/iproperty_admin_logo.gif', 'KnowledgeBase :: By The Thinkery' ).'
         </div>
         <div class="row-fluid">
             <div class="span5">
@@ -321,11 +256,10 @@ class com_knowledgebaseInstallerScript
         switch ($action){
             case "install":
                 echo $this->install_message;
-                //$this->addContentTypes();
+                $this->addContentTypes();
                 break;
             case "update":
                 echo $this->update_message;
-                //if($this->getParam('version') <= '3.1') $this->addContentTypes();
                 break;
             case "uninstall":
                 echo $this->uninstall_message;
@@ -348,21 +282,21 @@ class com_knowledgebaseInstallerScript
             </div>
             <div class="span7">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="#ipchangelog" data-toggle="tab">'.JText::_('Change Log').'</a></li>';
+                    <li class="active"><a href="#kbchangelog" data-toggle="tab">'.JText::_('Change Log').'</a></li>';
 
         if (count($this->installed_plugs))
         {
-            echo '<li><a href="#ipplugins" data-toggle="tab">'.JText::_('Plugins').'</a></li>';
+            echo '<li><a href="#kbplugins" data-toggle="tab">'.JText::_('Plugins').'</a></li>';
         }
         if (count($this->installed_mods))
         {
-            echo '<li><a href="#ipmodules" data-toggle="tab">'.JText::_('Modules').'</a></li>';
+            echo '<li><a href="#kbmodules" data-toggle="tab">'.JText::_('Modules').'</a></li>';
         }
         echo '
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane active" id="ipchangelog">';
-        $logfile            = JPATH_ADMINISTRATOR.'/components/com_iproperty/assets/CHANGELOG.TXT';
+                    <div class="tab-pane active" id="kbchangelog">';
+        $logfile            = JPATH_ADMINISTRATOR.'/components/com_knowledgebase/assets/CHANGELOG.TXT';
         if(JFile::exists($logfile))
         {
             $logcontent     = JFile::read($logfile);
@@ -377,7 +311,7 @@ class com_knowledgebaseInstallerScript
         if (count($this->installed_plugs))
         {
             echo '
-                            <div class="tab-pane" id="ipplugins">
+                            <div class="tab-pane" id="kbplugins">
                                 <div>
                                     <table class="table table-striped">
                                         <thead>
@@ -411,7 +345,7 @@ class com_knowledgebaseInstallerScript
         if (count($this->installed_mods))
         {
             echo '
-                            <div class="tab-pane" id="ipmodules">
+                            <div class="tab-pane" id="kbmodules">
                                 <div>
                                     <table class="table table-striped">
                                         <thead>
@@ -442,24 +376,12 @@ class com_knowledgebaseInstallerScript
         echo '
             </div>
         </div>';
-
-        // Fix for IP3.1.2 bug by not adding mls_org to iproperty table in install sql, but only when
-        // updating. Will break backup/restore if this column does't exist. 
-        $db     = JFactory::getDbo();
-        $fields = $db->getTableColumns('#__iproperty');
-        if(!array_key_exists('mls_org', $fields))
-        {
-            $query = 'ALTER TABLE '.$db->quoteName('#__iproperty').' ADD '.$db->quoteName('mls_org').' VARCHAR(100) NOT NULL AFTER '.$db->quoteName('mls_id');
-            $db->setQuery($query);
-            $db->execute();
-        }
-        // end fix               
     }
 
     function getParam( $name )
     {
         $this->db = JFactory::getDbo();
-        $this->db->setQuery('SELECT manifest_cache FROM #__extensions WHERE name = "com_iproperty" AND type="component"');
+        $this->db->setQuery('SELECT manifest_cache FROM #__extensions WHERE name = "com_knowledgebase" AND type="component"');
         $manifest = json_decode( $this->db->loadResult(), true );
         return $manifest[$name];
     }
@@ -603,7 +525,7 @@ class com_knowledgebaseInstallerScript
     }
 
     // add tag items 
-    /*function addContentTypes(){
+    function addContentTypes(){
         // get the JTable instance
         $table = JTable::getInstance('Contenttype', 'JTable');
         $ip_ctypes = array();
@@ -611,7 +533,7 @@ class com_knowledgebaseInstallerScript
         $ip_ctypes[] = array(
             'type_id' => 0,
             'type_title' => 'Property',
-            'type_alias' => 'com_iproperty.property',
+            'type_alias' => 'com_knowledgebase.property',
             'table' => '#__iproperty',
             'rules' => '',
             'router' => 'IpropertyHelperRoute::getPropertyRoute',
@@ -622,5 +544,5 @@ class com_knowledgebaseInstallerScript
         foreach ($ip_ctypes as $ctype){
             $table->save($ctype);
         }
-    }*/
+    }
 }
