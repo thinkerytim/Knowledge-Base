@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema>
+    <!-- Metadata -->
+    <meta>
+        <!-- Supported driver types -->
+        <drivers>
+            <driver>mysql</driver>
+            <driver>mysqli</driver>
+        </drivers>
+    </meta>
+
+    <!-- SQL commands to run on installation and update -->
+    <sql>
+        <!-- Create the #__knowledgebase_categories table if it's missing -->
+        <action table="#__knowledgebase_categories" canfail="0">
+            <condition type="missing" value="" />
+            <query><![CDATA[
+CREATE TABLE IF NOT EXISTS `#__knowledgebase_categories` (
+`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+`title` varchar(255) NOT NULL,
+`slug` varchar(255) NOT NULL,
+`description` text NOT NULL,
+`parent` tinyint(3) unsigned NOT NULL DEFAULT 0,
+`ordering` int(10) unsigned NOT NULL DEFAULT 0,
+`access` int(10) unsigned NOT NULL DEFAULT 0,
+`publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+`publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+`enabled` tinyint(3) unsigned NOT NULL DEFAULT 1,
+`hits` int(10) unsigned NOT NULL DEFAULT 0,
+`created_by` int(10) NOT NULL DEFAULT 0,
+`created_on` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+`locked_on` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+`locked_by` int(11) NOT NULL DEFAULT 0,
+`modified_by` int(10) NOT NULL DEFAULT 0,
+`modified_on` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+`checked_out` int(10) NOT NULL DEFAULT 0,
+`checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+`language` char(7) NOT NULL DEFAULT '*',
+`icon` varchar(255) NOT NULL DEFAULT 'nopic.png',
+PRIMARY KEY (`id`),
+UNIQUE KEY `slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+            ]]></query>
+        </action>
+        <action table="#__knowledgebase_items" canfail="0">
+            <condition type="missing" value="params" />
+            <query><![CDATA[
+CREATE TABLE IF NOT EXISTS `#__knowledgebase_items` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `slug` varchar(255) NOT NULL DEFAULT '',
+  `body` text NOT NULL,
+  `featured` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `ordering` int(10) unsigned NOT NULL DEFAULT 0,
+  `access` int(10) unsigned NOT NULL DEFAULT 0,
+  `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `enabled` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `hits` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_by` int(10) NOT NULL DEFAULT 0,
+  `created_on` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `locked_on` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `locked_by` int(11) NOT NULL DEFAULT 0,
+  `modified_by` int(10) NOT NULL DEFAULT 0,
+  `modified_on` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `checked_out` int(10) NOT NULL DEFAULT 0,
+  `checked_out_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `language` char(7) NOT NULL DEFAULT '*',
+  `params` text NOT NULL DEFAULT '',
+  `metadata` text NOT NULL,
+  PRIMARY KEY (`id`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+            ]]></query>
+        </action>
+        <action>
+            <condition type="missing" value="params" />
+            <query><![CDATA[
+CREATE TABLE IF NOT EXISTS `#__knowledgebase_itemcat` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `item_id` int(10) unsigned NOT NULL,
+  `cat_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `item_cat` (`item_id`,`cat_id`),
+  KEY `item_id` (`item_id`),
+  KEY `cat_id` (`cat_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+            ]]></query>
+        </action>
+    </sql>
+</schema>

@@ -9,7 +9,7 @@
     <license>GNU/GPL v2</license>
     <version>3.4.1</version>
     <description>COM_KNOWLEDGEBASE_DESC</description>
-    <scriptfile>installfile.php</scriptfile>
+    <scriptfile>script.knowledgebase.php</scriptfile>
 
     <languages>
         <language tag="en-GB">languages/site/en-GB/en-GB.com_knowledgebase.ini</language>
